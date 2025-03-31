@@ -755,8 +755,27 @@ body {
   color: #333333 !important; /* Dark text color */
 }
 
+/* Target specifically metric cards with white backgrounds */
+.stMetric[style*="background-color: white"], 
+.element-container:has(> div[style*="background-color: white"]) .stMarkdown,
+.css-1r6slb0, /* Metric card class */
+.css-1xarl3l,  /* Value text in metrics */
+.css-183lzff { /* Label text in metrics */
+  color: #333333 !important; /* Dark text color */
+}
+
+/* Target specifically the numbers in metric cards */
+[data-testid="stMetricValue"] > div {
+  color: #333333 !important; /* Dark text color for metric values */
+}
+
+/* Target specifically the metric labels/titles */
+[data-testid="stMetricLabel"] > div {
+  color: #333333 !important; /* Dark text color for metric labels */
+}
+
 /* Maintain light text in colored sections */
-h1, h2, h3, h4, h5, h6, p, span, div:not(.element-with-white-background):not(.st-emotion-cache-1kyxreq):not(.st-emotion-cache-16txtl3):not(.st-emotion-cache-1v0mbdj) {
+h1, h2, h3, h4, h5, h6, p, span, div:not(.element-with-white-background):not(.st-emotion-cache-1kyxreq):not(.st-emotion-cache-16txtl3):not(.st-emotion-cache-1v0mbdj):not([data-testid="stMetricValue"] > div):not([data-testid="stMetricLabel"] > div) {
   color: #a0a0a0 !important; /* Light gray text color for other elements */
 }
 
