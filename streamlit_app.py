@@ -709,7 +709,7 @@ st.markdown("""
   padding: 15px;
   margin-bottom: 15px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  color: #f0f0f0; /* Changed to dark white */
+  color: #f0f0f0; /* Dark white */
 }
 
 .section-title {
@@ -735,24 +735,24 @@ st.markdown("""
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #f0f0f0; /* Changed to dark white */
+  color: #f0f0f0; /* Dark white */
 }
 
 /* Global text color settings */
 body {
-  color: #f0f0f0 !important; /* Changed to dark white */
+  color: #f0f0f0 !important; /* Dark white */
 }
 
 /* White background text color override */
 .element-with-white-background {
-  color: #f0f0f0 !important; /* Dark white text color */
+  color: #333333 !important; /* Dark text color */
 }
 
-/* Apply dark white text only to white/light background elements */
+/* Apply dark text only to white/light background elements */
 .st-emotion-cache-1kyxreq, /* Streamlit white background containers */
 .st-emotion-cache-16txtl3, /* Some white card elements */
 .st-emotion-cache-1v0mbdj {
-  color: #f0f0f0 !important; /* Dark white text color */
+  color: #333333 !important; /* Dark text color */
 }
 
 /* Target specifically metric cards with white backgrounds */
@@ -761,34 +761,34 @@ body {
 .css-1r6slb0, /* Metric card class */
 .css-1xarl3l,  /* Value text in metrics */
 .css-183lzff { /* Label text in metrics */
-  color: #f0f0f0 !important; /* Dark white text color */
+  color: #333333 !important; /* Dark text color */
 }
 
 /* Target specifically the numbers in metric cards */
 [data-testid="stMetricValue"] > div {
-  color: #f0f0f0 !important; /* Dark white text color for metric values */
+  color: #333333 !important; /* Dark text color for metric values */
 }
 
 /* Target specifically the metric labels/titles */
 [data-testid="stMetricLabel"] > div {
-  color: #f0f0f0 !important; /* Dark white text color for metric labels */
+  color: #333333 !important; /* Dark text color for metric labels */
 }
 
 /* Maintain dark white text in colored sections */
 h1, h2, h3, h4, h5, h6, p, span, div:not(.element-with-white-background):not(.st-emotion-cache-1kyxreq):not(.st-emotion-cache-16txtl3):not(.st-emotion-cache-1v0mbdj):not([data-testid="stMetricValue"] > div):not([data-testid="stMetricLabel"] > div) {
-  color: #f0f0f0 !important; /* Changed to dark white */
+  color: #f0f0f0 !important; /* Dark white */
 }
 
 /* Chart text color */
 .js-plotly-plot .plotly .gtitle, 
 .js-plotly-plot .plotly .xtitle, 
 .js-plotly-plot .plotly .ytitle {
-  fill: #f0f0f0 !important; /* Changed to dark white */
+  fill: #f0f0f0 !important; /* Dark white */
 }
 
 .js-plotly-plot .plotly .xtick text, 
 .js-plotly-plot .plotly .ytick text {
-  fill: #f0f0f0 !important; /* Changed to dark white */
+  fill: #f0f0f0 !important; /* Dark white */
 }
 </style>
 """, unsafe_allow_html=True)
