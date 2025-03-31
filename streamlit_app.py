@@ -743,40 +743,35 @@ body {
   color: #f0f0f0 !important; /* Dark white */
 }
 
-/* White background text color override */
-.element-with-white-background {
+/* Target only specific white background elements */
+.stDataFrame, /* For dataframe white backgrounds */
+[data-testid="stMetricValue"],
+[data-testid="stMetricLabel"],
+div[style*="background-color: white"],
+div[style*="background-color: #fff"],
+div[style*="background-color: rgb(255, 255, 255)"],
+div[style*="background: white"],
+div[style*="background: #fff"],
+div[style*="background: rgb(255, 255, 255)"],
+.stTile, /* Metric tiles */
+.st-emotion-cache-q8sbsg p, /* New Streamlit metric value */ 
+.st-emotion-cache-p5msec p /* New Streamlit metric label */ {
   color: #333333 !important; /* Dark text color */
 }
 
-/* Apply dark text only to white/light background elements */
-.st-emotion-cache-1kyxreq, /* Streamlit white background containers */
-.st-emotion-cache-16txtl3, /* Some white card elements */
-.st-emotion-cache-1v0mbdj {
-  color: #333333 !important; /* Dark text color */
+/* Specifically target metric cards */
+.row-widget.stButton > button:has(div[style*="background-color: white"]),
+.row-widget.stButton > button:has(div[style*="background-color: #fff"]) {
+  color: #333333 !important;
 }
 
-/* Target specifically metric cards with white backgrounds */
-.stMetric[style*="background-color: white"], 
-.element-container:has(> div[style*="background-color: white"]) .stMarkdown,
-.css-1r6slb0, /* Metric card class */
-.css-1xarl3l,  /* Value text in metrics */
-.css-183lzff { /* Label text in metrics */
-  color: #333333 !important; /* Dark text color */
-}
-
-/* Target specifically the numbers in metric cards */
-[data-testid="stMetricValue"] > div {
-  color: #333333 !important; /* Dark text color for metric values */
-}
-
-/* Target specifically the metric labels/titles */
-[data-testid="stMetricLabel"] > div {
-  color: #333333 !important; /* Dark text color for metric labels */
-}
-
-/* Maintain dark white text in colored sections */
-h1, h2, h3, h4, h5, h6, p, span, div:not(.element-with-white-background):not(.st-emotion-cache-1kyxreq):not(.st-emotion-cache-16txtl3):not(.st-emotion-cache-1v0mbdj):not([data-testid="stMetricValue"] > div):not([data-testid="stMetricLabel"] > div) {
-  color: #f0f0f0 !important; /* Dark white */
+/* Target text in cells with white background */
+.cell-with-white-bg, /* If you have custom classes */
+td[style*="background-color: white"],
+td[style*="background-color: #fff"],
+td[style*="background: white"],
+td[style*="background: #fff"] {
+  color: #333333 !important;
 }
 
 /* Chart text color */
@@ -789,6 +784,23 @@ h1, h2, h3, h4, h5, h6, p, span, div:not(.element-with-white-background):not(.st
 .js-plotly-plot .plotly .xtick text, 
 .js-plotly-plot .plotly .ytick text {
   fill: #f0f0f0 !important; /* Dark white */
+}
+
+/* Special case for metric values showing in white cards like in your screenshots */
+.element-container .stMarkdown div[data-testid="stMarkdownContainer"] p {
+  color: #333333 !important; /* Dark text */
+}
+
+/* Target specifically the white cards in your dashboard */
+[data-testid="column"] > div > div > div > div {
+  color: #333333 !important; /* Dark text */
+}
+
+/* Target text in white tiles from your screenshots */
+div[data-baseweb="card"],
+div[data-testid="stVerticalBlock"] > div > div[style*="background-color: white"],
+div[data-testid="stHorizontalBlock"] > div > div[style*="background-color: white"] {
+  color: #333333 !important; /* Dark text */
 }
 </style>
 """, unsafe_allow_html=True)
