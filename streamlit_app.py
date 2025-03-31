@@ -759,6 +759,27 @@ div[style*="background: rgb(255, 255, 255)"],
   color: #333333 !important; /* Dark text color */
 }
 
+/* Improved visibility for text on blue backgrounds */
+div[style*="background-color: #4e8df5"],
+div[style*="background-color: rgb(78, 141, 245)"],
+div[style*="background: #4e8df5"],
+div[style*="background: rgb(78, 141, 245)"],
+.section-title,
+div[style*="background-color: blue"],
+div[style*="background: blue"],
+/* Target specifically blue elements from your screenshots */
+[data-testid="stMarkdownContainer"] p[style*="color: white"],
+.stMarkdown div[style*="background-color: #0000ff"],
+.stMarkdown div[style*="background-color: rgb(0, 0, 255)"],
+.stMarkdown div[style*="background-color: blue"],
+/* Other blue background cases */
+div[style*="background-color: #4287f5"],
+div[style*="background-color: #0066cc"] {
+  color: white !important; /* Pure white text for better contrast on blue */
+  font-weight: 600 !important; /* Make text slightly bolder */
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5) !important; /* Add subtle text shadow for better readability */
+}
+
 /* Specifically target metric cards */
 .row-widget.stButton > button:has(div[style*="background-color: white"]),
 .row-widget.stButton > button:has(div[style*="background-color: #fff"]) {
