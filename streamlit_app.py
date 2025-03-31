@@ -234,111 +234,39 @@ def main():
 
             # Custom CSS for dashboard layout
             st.markdown("""
-<style>
-/* Main app background */
-.stApp {
-    background-color: #f0f7ff !important;  /* Soft, natural light blue */
-}
-
-.visualization-container {
-    background-color: #ffffff;  /* Clean white background */
-    border-radius: 10px;
-    border: 1px solid #c7d8eb;  /* Natural blue-gray border */
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);  /* Subtle shadow */
-}
-
-.section-title {
-    padding: 10px;
-    background-color: #4285f4;  /* Rich, natural blue */
-    color: white;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.stMetric {
-    background-color: #f5f8fd;  /* Very subtle blue tint */
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-    border: 1px solid #dee8f3;  /* Light natural blue-gray border */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);  /* Very subtle shadow */
-}
-
-.stMetric > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* Sidebar styling */
-.css-6qob1r {
-    background-color: #e1edfb !important;  /* Slightly deeper blue for sidebar */
-}
-
-/* Headers and text */
-h1, h2, h3 {
-    color: #2c5282 !important;  /* Deep natural blue for headings */
-}
-
-/* Widget backgrounds */
-.stSelectbox > div > div, 
-.stMultiselect > div > div {
-    background-color: #ffffff;
-    border: 1px solid #c7d8eb;
-}
-
-/* Button styling for a more natural look */
-.stButton > button {
-    background-color: #3d7be7;  /* Natural medium blue */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 15px;
-    font-weight: 500;  /* Not too bold */
-    box-shadow: 0 2px 5px rgba(61, 123, 231, 0.2);  /* Subtle blue shadow */
-}
-
-.stButton > button:hover {
-    background-color: #4285f4;
-    box-shadow: 0 2px 5px rgba(61, 123, 231, 0.3);
-}
-
-/* File uploader with natural styling */
-.uploadedFileData {
-    background-color: #e9f2fd !important;
-    border: 1px dashed #a4c2f4 !important;
-}
-
-/* Expanders */
-.streamlit-expanderHeader {
-    background-color: #e9f2fd !important;
-    color: #2c5282 !important;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f0f7ff;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #a4c2f4;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #6fa4fc;
-}
-</style>
-""", unsafe_allow_html=True)
+            <style>
+            .visualization-container {
+                background-color: #f9f9f9;
+                border-radius: 10px;
+                border: 1px solid #ddd;
+                padding: 15px;
+                margin-bottom: 15px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .section-title {
+                padding: 10px;
+                background-color: #4e8df5;
+                color: white;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                text-align: center;
+                font-weight: bold;
+            }
+            .stMetric {
+                background-color: #f0f2f6;
+                padding: 10px;
+                border-radius: 5px;
+                text-align: center;
+                border: 1px solid #ddd;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+            .stMetric > div {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            </style>
+            """, unsafe_allow_html=True)
             
             # VISUALIZATION SECTIONS ORGANIZED IN 3 COLUMNS
             
@@ -770,263 +698,22 @@ h1, h2, h3 {
     else:
         st.info("Please upload an Excel file to begin analysis.")
 
-def apply_light_blue_theme():
-    # Custom CSS for light blue theme dashboard with light blue background
-    st.markdown("""
-    <style>
-    /* Main background and text colors */
-    .main {
-        background-color: #e6f2ff;  /* Lighter blue background */
-        color: #333333;
-        font-family: 'Arial', sans-serif;
-    }
-
-    /* Dashboard title styling */
-    .dashboard-title {
-        background-color: #1a73e8;  /* Bright blue */
-        color: white;
-        padding: 12px 15px;
-        border-radius: 8px;
-        text-align: center;
-        margin-bottom: 20px;
-        font-weight: bold;
-        font-size: 24px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border: 1px solid #4285f4;
-    }
-
-    /* Metric card styling */
-    .metric-card {
-        background-color: #ffffff;  /* White background */
-        border-radius: 8px;
-        padding: 15px;
-        margin: 10px 0px;
-        border: 1px solid #d0e1f9;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        text-align: center;
-    }
-
-    .metric-value {
-        font-size: 36px;
-        font-weight: bold;
-        margin: 0;
-        color: #1a73e8;  /* Blue text for values */
-    }
-
-    .metric-label {
-        font-size: 14px;
-        color: #5f6368;  /* Gray text for labels */
-        margin-top: 5px;
-    }
-
-    /* Section title styling */
-    .section-title {
-        padding: 10px;
-        background-color: #d0e1f9;  /* Light blue background */
-        color: #1a73e8;  /* Blue text */
-        border-radius: 5px;
-        margin: 15px 0px;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    /* Visualization container styling */
-    .visualization-container {
-        background-color: #ffffff;
-        border-radius: 8px;
-        border: 1px solid #d0e1f9;
-        padding: 15px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Chart styling */
-    .chart-container {
-        padding: 10px;
-        background-color: #f5f9ff;
-        border-radius: 8px;
-        margin-bottom: 15px;
-    }
-
-    /* Chart title styling */
-    .chart-title {
-        font-size: 16px;
-        font-weight: bold;
-        color: #1a73e8;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-
-    /* Custom colors for charts */
-    .custom-chart .bar {
-        fill: #4285f4;  /* Google blue */
-    }
-
-    .custom-chart .line {
-        stroke: #0d47a1;  /* Darker blue */
-    }
-
-    .custom-chart .area {
-        fill: #bbdefb;  /* Very light blue */
-    }
-
-    /* Plotly chart background and styling */
-    .js-plotly-plot .plotly .main-svg {
-        background-color: #f5f9ff !important;
-    }
-
-    .js-plotly-plot .plotly .bg {
-        fill: #f5f9ff !important;
-    }
-
-    /* Axes styling for charts */
-    .js-plotly-plot .plotly .xtick text, 
-    .js-plotly-plot .plotly .ytick text {
-        fill: #5f6368 !important;
-    }
-
-    .js-plotly-plot .plotly .xgrid, 
-    .js-plotly-plot .plotly .ygrid {
-        stroke: #e0e0e0 !important;
-        stroke-width: 1 !important;
-    }
-
-    /* Sidebar styling */
-    .css-6qob1r {
-        background-color: #cce4ff;  /* Light blue sidebar */
-    }
-
-    .css-hxt7ib {
-        padding-top: 2rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-
-    /* Form elements styling */
-    .stTextInput > div > div > input, 
-    .stSelectbox > div > div, 
-    .stMultiselect > div > div {
-        background-color: #ffffff;
-        color: #333333;
-        border: 1px solid #d0e1f9;
-    }
-
-    .stDateInput > div > div > input {
-        background-color: #ffffff;
-        color: #333333;
-        border: 1px solid #d0e1f9;
-    }
-
-    /* Button styling */
-    .stButton > button {
-        background-color: #1a73e8;  /* Google blue */
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 5px 15px;
-        font-weight: bold;
-    }
-
-    .stButton > button:hover {
-        background-color: #4285f4;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #e6f2ff;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #b8d1f3;
-        border-radius: 5px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #4285f4;
-    }
-
-    /* Pie chart colors */
-    .pie-chart-colors {
-        --color1: #4285f4;  /* Blue */
-        --color2: #ea4335;  /* Red */
-        --color3: #fbbc05;  /* Yellow */
-        --color4: #34a853;  /* Green */
-        --color5: #ab47bc;  /* Purple */
-    }
-
-    /* Additional chart styling for specific types */
-    .bar-chart-container .bar {
-        border-radius: 5px 5px 0 0;
-    }
-
-    /* Table styling */
-    .dataframe {
-        background-color: #ffffff;
-        border: 1px solid #d0e1f9;
-        border-radius: 5px;
-    }
-
-    .dataframe th {
-        background-color: #e8f0fe;
-        color: #1a73e8;
-        padding: 8px;
-    }
-
-    .dataframe td {
-        background-color: #ffffff;
-        color: #5f6368;
-        padding: 8px;
-    }
-    
-    /* Streamlit app background - additional selectors to ensure it works */
-    .stApp {
-        background-color: #e6f2ff !important;
-    }
-    
-    /* File uploader area */
-    .uploadedFileData {
-        background-color: #cce4ff !important;
-        border: 1px dashed #90caf9 !important;
-    }
-    
-    /* Success messages */
-    .stSuccess {
-        background-color: #e8f5e9 !important;
-        border: 1px solid #a5d6a7 !important;
-    }
-    
-    /* Header styling */
-    h1, h2, h3, h4, h5, h6 {
-        color: #0d47a1 !important;
-    }
-    
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        background-color: #bbdefb !important;
-        color: #0d47a1 !important;
-    }
-    
-    /* Tabs styling */
-    .stTabs [data-baseweb="tab-list"] {
-        background-color: #cce4ff !important;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        color: #0d47a1 !important;
-    }
-    
-    /* Status area */
-    .stStatusWidget {
-        background-color: #e3f2fd !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
+# Custom CSS
+st.markdown("""
+<style>
+.stMetric {
+    background-color: #f0f2f6;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+.stMetric > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # Run the main function
 if __name__ == "__main__":
