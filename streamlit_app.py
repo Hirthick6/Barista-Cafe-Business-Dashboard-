@@ -701,16 +701,51 @@ def main():
 # Custom CSS
 st.markdown("""
 <style>
+.visualization-container {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #a0a0a0; /* Light gray text color */
+}
+.section-title {
+    padding: 10px;
+    background-color: #4e8df5;
+    color: #e6e6e6; /* Light text color for section titles */
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
 .stMetric {
     background-color: #f0f2f6;
     padding: 10px;
     border-radius: 5px;
     text-align: center;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 .stMetric > div {
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: #a0a0a0; /* Light gray text color */
+}
+/* Global text color settings */
+body {
+    color: #a0a0a0 !important; /* Light gray text color */
+}
+h1, h2, h3, h4, h5, h6, p, span, div {
+    color: #a0a0a0 !important; /* Light gray text color */
+}
+/* Chart text color */
+.js-plotly-plot .plotly .gtitle, .js-plotly-plot .plotly .xtitle, .js-plotly-plot .plotly .ytitle {
+    fill: #a0a0a0 !important; /* Light text for chart titles */
+}
+.js-plotly-plot .plotly .xtick text, .js-plotly-plot .plotly .ytick text {
+    fill: #a0a0a0 !important; /* Light text for axis labels */
 }
 </style>
 """, unsafe_allow_html=True)
