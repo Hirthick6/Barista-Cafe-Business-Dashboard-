@@ -780,6 +780,28 @@ div[style*="background-color: #0066cc"] {
   text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5) !important; /* Add subtle text shadow for better readability */
 }
 
+/* BLACK BACKGROUND TEXT - ensure white text for black backgrounds */
+div[style*="background-color: black"],
+div[style*="background-color: #000"],
+div[style*="background-color: rgb(0, 0, 0)"],
+div[style*="background: black"],
+div[style*="background: #000"],
+div[style*="background: rgb(0, 0, 0)"],
+div[style*="background-color: #1e1e1e"],
+div[style*="background-color: #222"],
+div[style*="background-color: #272727"],
+/* Specific sections with dark background */
+[data-testid="stHeader"],
+[data-testid="baseButton-secondary"],
+/* Specific metric sections */
+[data-testid="stMarkdownContainer"]:has(h3:contains("Prediction Model Performance")),
+div:contains("Showing analysis for 2,034 records"),
+div:contains("Prediction Model Performance") {
+  color: white !important; /* Bright white for best visibility on dark backgrounds */
+  font-weight: 500 !important; /* Slightly bolder */
+  text-shadow: 0px 0px 1px rgba(255, 255, 255, 0.2) !important; /* Subtle glow for legibility */
+}
+
 /* Specifically target metric cards */
 .row-widget.stButton > button:has(div[style*="background-color: white"]),
 .row-widget.stButton > button:has(div[style*="background-color: #fff"]) {
@@ -822,6 +844,17 @@ div[data-baseweb="card"],
 div[data-testid="stVerticalBlock"] > div > div[style*="background-color: white"],
 div[data-testid="stHorizontalBlock"] > div > div[style*="background-color: white"] {
   color: #333333 !important; /* Dark text */
+}
+
+/* DIRECT OVERRIDE for "Prediction Model Performance" and "Showing analysis" text */
+h3:contains("Prediction Model Performance"),
+div:contains("Prediction Model Performance"),
+div:contains("Showing analysis for 2,034 records"),
+.element-container:contains("Prediction Model Performance") *,
+.element-container:contains("Showing analysis for") * {
+  color: white !important;
+  font-weight: 600 !important;
+  text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.3) !important;
 }
 </style>
 """, unsafe_allow_html=True)
