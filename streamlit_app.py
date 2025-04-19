@@ -6,10 +6,12 @@ import plotly.graph_objs as go
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+import matplotlib.pyplot as plt
 
 # Page Configuration
-st.set_page_config(page_title="Sri Krisha cafe Sales Dashboard", page_icon="🍽️", layout="wide")
+st.set_page_config(page_title="Sri Krishna Cafe Sales Dashboard", page_icon="🍽️", layout="wide")
 
 # Enhanced Parsing and Data Loading Functions
 def parse_date(date_str):
@@ -35,7 +37,7 @@ def parse_date(date_str):
 @st.cache_data
 def load_data(file_path):
     try:
-        df = pd.read_excel(file_path)
+        df = pd.read_excel("DATASET_BA (1).xlsx")
         df.columns = [col.strip() for col in df.columns]
         
         if 'Transaction Date' in df.columns:
@@ -53,6 +55,142 @@ def load_data(file_path):
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return None
+
+# SARIMA Forecasting Functions
+def prepare_ts_data(df, date_col='Transaction Date', target_col='AMOUNT', freq='D'):
+    """Prepare time series data by resampling to specified frequency"""
+    # Convert to datetime if it's not already
+    df[date_col] = pd.to_datetime(df[date_col])
+    
+    # Set the date column as index
+    ts_df = df.set_index(date_col)
+    
+    # Resample to the specified frequency (e.g., 'D' for daily, 'W' for weekly)
+    ts_df = ts_df[target_col].resample(freq).sum().fillna(0)
+    
+    return ts_df
+
+def train_sarima_model(ts_data, train_end_date, order=(1,1,1), seasonal_order=(1,1,1,7)):
+    """Train a SARIMA model on the time series data up to train_end_date"""
+    try:
+        # Split data
+        train_data = ts_data[ts_data.index < train_end_date]
+        
+        # Fit SARIMA model
+        model = SARIMAX(
+            train_data,
+            order=order,
+            seasonal_order=seasonal_order,
+            enforce_stationarity=False,
+            enforce_invertibility=False
+        )
+        results = model.fit(disp=False)
+        
+        return results, train_data
+    except Exception as e:
+        st.error(f"Error training SARIMA model: {e}")
+        return None, None
+
+def forecast_and_evaluate(model_results, train_data, ts_data, train_end_date, forecast_periods=30):
+    """Generate forecasts and evaluate the model performance on test data"""
+    try:
+        # Get test data
+        test_data = ts_data[ts_data.index >= train_end_date]
+        test_periods = len(test_data)
+        periods_to_forecast = max(test_periods, forecast_periods)
+        
+        # Generate forecasts
+        forecast = model_results.get_forecast(steps=periods_to_forecast)
+        forecast_mean = forecast.predicted_mean
+        forecast_ci = forecast.conf_int()
+        
+        # Align forecast index with test data index for actual test periods
+        if test_periods > 0:
+            actual_test = test_data[:test_periods]
+            predicted_test = forecast_mean[:test_periods]
+            
+            # Calculate metrics
+            mae = mean_absolute_error(actual_test, predicted_test)
+            rmse = np.sqrt(mean_squared_error(actual_test, predicted_test))
+            mape = mean_absolute_percentage_error(actual_test, predicted_test) * 100
+            
+            metrics = {
+                'mae': mae,
+                'rmse': rmse,
+                'mape': mape
+            }
+        else:
+            metrics = None
+            actual_test = pd.Series(dtype=float)
+        
+        # Create a DataFrame for future forecasts
+        future_dates = pd.date_range(
+            start=train_data.index[-1] + pd.Timedelta(days=1),
+            periods=periods_to_forecast,
+            freq=train_data.index.freq
+        )
+        
+        # Create forecast dataframe
+        forecast_df = pd.DataFrame({
+            'Forecast': forecast_mean.values,
+            'Lower CI': forecast_ci.iloc[:, 0].values,
+            'Upper CI': forecast_ci.iloc[:, 1].values
+        }, index=future_dates)
+        
+        return forecast_df, metrics, actual_test
+    except Exception as e:
+        st.error(f"Error in forecasting and evaluation: {e}")
+        return None, None, None
+
+def try_multiple_seasonal_orders(ts_data, train_end_date, base_order=(1,1,1), freq='D'):
+    """Try multiple seasonal orders and return results for each"""
+    # Set up seasonal periods based on frequency
+    if freq == 'D':
+        seasonal_periods = [7, 14, 30]  # Daily data - try weekly, bi-weekly, monthly seasonality
+    elif freq == 'W':
+        seasonal_periods = [4, 8, 12, 26]  # Weekly data - try monthly, bi-monthly, quarterly, 6mo seasonality
+    elif freq == 'M':
+        seasonal_periods = [3, 6, 12]  # Monthly data - try quarterly, bi-annual, annual seasonality
+    else:
+        seasonal_periods = [4, 12, 52]  # Default options
+    
+    results = []
+    
+    # Try each seasonal period
+    for sp in seasonal_periods:
+        seasonal_order = (1, 1, 1, sp)
+        st.write(f"Trying seasonal order with period {sp}...")
+        
+        # Train model
+        model_results, train_data = train_sarima_model(
+            ts_data, 
+            train_end_date,
+            order=base_order,
+            seasonal_order=seasonal_order
+        )
+        
+        if model_results is not None:
+            # Generate forecasts and evaluate
+            forecast_df, metrics, actual_test = forecast_and_evaluate(
+                model_results, train_data, ts_data, train_end_date
+            )
+            
+            if metrics is not None:
+                results.append({
+                    'seasonal_period': sp,
+                    'seasonal_order': seasonal_order,
+                    'metrics': metrics,
+                    'model_results': model_results,
+                    'train_data': train_data,
+                    'forecast_df': forecast_df,
+                    'actual_test': actual_test
+                })
+    
+    # Sort results by MAPE (lower is better)
+    if results:
+        results.sort(key=lambda x: x['metrics']['mape'])
+    
+    return results
 
 # Train Sales Prediction Model
 def train_sales_prediction_model(df):
@@ -106,16 +244,10 @@ def train_sales_prediction_model(df):
 
 # Main App Function
 def main():
-    st.title("🍽️ Sri Krisha Cafe Sales Dashboard")
-    st.markdown("### Upload your sales data for comprehensive analysis")
+    st.title("🍽️ Sri Krishna Cafe Sales Dashboard")
+    uploaded_file = True
 
-    # File Upload
-    st.sidebar.header("📂 Upload Excel File")
-    uploaded_file = st.sidebar.file_uploader(
-        "Choose an Excel file", type=['xlsx', 'xls']
-    )
-
-    if uploaded_file is not None:
+    if uploaded_file:
         # Load Data
         df = load_data(uploaded_file)
         
@@ -232,6 +364,302 @@ def main():
                 value=f"₹{predicted_sales:.2f}"
             )
 
+            # SARIMA Time Series Forecasting
+            st.markdown('<div class="section-title">📈 Time Series Forecasting</div>', unsafe_allow_html=True)
+            
+            # Create tabs for forecasting
+            ts_tab1, ts_tab2 = st.tabs(["Basic Forecast", "Advanced Parameters"])
+            
+            with ts_tab1:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    # Select frequency for time series
+                    freq_options = {'Daily': 'D', 'Weekly': 'W', 'Monthly': 'M'}
+                    ts_freq = st.selectbox(
+                        "Select time frequency", 
+                        options=list(freq_options.keys()),
+                        index=1  # Default to Weekly
+                    )
+                    selected_freq = freq_options[ts_freq]
+                    
+                    # Select product for forecasting (or All)
+                    product_for_forecast = st.selectbox(
+                        "Select product for forecasting",
+                        options=['All Products'] + sorted(df['PRODUCT'].unique().tolist())
+                    )
+                
+                with col2:
+                    # Set forecast horizon
+                    forecast_periods = st.slider(
+                        "Forecast horizon (periods)", 
+                        min_value=7, 
+                        max_value=90, 
+                        value=30
+                    )
+                    
+                    # Set train/test split date
+                    default_split = df['Transaction Date'].max() - pd.DateOffset(months=1)
+                    train_end_date = st.date_input(
+                        "Training data end date (for validation)",
+                        value=default_split,
+                        min_value=df['Transaction Date'].min().date(),
+                        max_value=df['Transaction Date'].max().date()
+                    )
+                
+                # Prepare time series data based on selections
+                if product_for_forecast == 'All Products':
+                    time_series_df = prepare_ts_data(
+                        filtered_df, 
+                        date_col='Transaction Date', 
+                        target_col='AMOUNT', 
+                        freq=selected_freq
+                    )
+                else:
+                    # Filter for selected product
+                    product_df = filtered_df[filtered_df['PRODUCT'] == product_for_forecast]
+                    time_series_df = prepare_ts_data(
+                        product_df, 
+                        date_col='Transaction Date', 
+                        target_col='AMOUNT', 
+                        freq=selected_freq
+                    )
+                
+                # Train SARIMA model and generate forecast
+                st.markdown("### Training SARIMA Model")
+                progress_bar = st.progress(0)
+                
+                # Set default seasonal period based on frequency
+                if selected_freq == 'D':
+                    default_seasonal = 7  # Weekly seasonality for daily data
+                elif selected_freq == 'W':
+                    default_seasonal = 4  # Monthly seasonality for weekly data
+                else:
+                    default_seasonal = 12  # Yearly seasonality for monthly data
+                
+                # Train the model
+                progress_bar.progress(30)
+                model_results, train_data = train_sarima_model(
+                    time_series_df, 
+                    pd.Timestamp(train_end_date),
+                    order=(1, 1, 1),
+                    seasonal_order=(1, 1, 1, default_seasonal)
+                )
+                
+                if model_results is not None:
+                    progress_bar.progress(60)
+                    # Generate forecasts
+                    forecast_df, metrics, actual_test = forecast_and_evaluate(
+                        model_results, 
+                        train_data, 
+                        time_series_df, 
+                        pd.Timestamp(train_end_date),
+                        forecast_periods
+                    )
+                    
+                    progress_bar.progress(100)
+                    
+                    # Show metrics if validation data is available
+                    if metrics is not None and len(actual_test) > 0:
+                        st.markdown("### Model Performance")
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("Mean Absolute Error (MAE)", f"₹{metrics['mae']:.2f}")
+                        with col2:
+                            st.metric("Root Mean Squared Error (RMSE)", f"₹{metrics['rmse']:.2f}")
+                        with col3:
+                            st.metric("Mean Absolute Percentage Error (MAPE)", f"{metrics['mape']:.2f}%")
+                    
+                    # Plot the forecast
+                    st.markdown("### Sales Forecast")
+                    
+                    # Convert to Plotly for better interactivity
+                    fig = go.Figure()
+                    
+                    # Historical data
+                    fig.add_trace(go.Scatter(
+                        x=time_series_df.index, 
+                        y=time_series_df.values,
+                        mode='lines',
+                        name='Historical Sales',
+                        line=dict(color='blue')
+                    ))
+                    
+                    # Forecasted data
+                    fig.add_trace(go.Scatter(
+                        x=forecast_df.index, 
+                        y=forecast_df['Forecast'].values,
+                        mode='lines',
+                        name='Forecast',
+                        line=dict(color='red')
+                    ))
+                    
+                    # Confidence intervals
+                    fig.add_trace(go.Scatter(
+                        x=forecast_df.index.tolist() + forecast_df.index.tolist()[::-1],
+                        y=forecast_df['Upper CI'].tolist() + forecast_df['Lower CI'].tolist()[::-1],
+                        fill='toself',
+                        fillcolor='rgba(255,0,0,0.2)',
+                        line=dict(color='rgba(255,255,255,0)'),
+                        name='95% Confidence Interval'
+                    ))
+                    
+                    fig.update_layout(
+                        title=f"SARIMA Forecast for {product_for_forecast if product_for_forecast != 'All Products' else 'All Products'}",
+                        xaxis_title="Date",
+                        yaxis_title="Sales Amount (₹)",
+                        template="plotly_white",
+                        hovermode="x unified"
+                    )
+                    
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Display forecast data in a table
+                    st.markdown("### Forecast Data")
+                    
+                    # Format the forecast dataframe for display
+                    display_forecast = forecast_df.copy()
+                    display_forecast.index = display_forecast.index.strftime('%Y-%m-%d')
+                    display_forecast.index.name = 'Date'
+                    display_forecast = display_forecast.round(2)
+                    
+                    st.dataframe(display_forecast)
+                    
+                    # Option to download forecast
+                    csv = display_forecast.to_csv()
+                    st.download_button(
+                        "Download Forecast CSV",
+                        csv,
+                        "sales_forecast.csv",
+                        "text/csv",
+                        key='download-forecast'
+                    )
+                else:
+                    st.error("Failed to train the SARIMA model. Please check your data or try different parameters.")
+            
+            with ts_tab2:
+                st.markdown("### Advanced SARIMA Parameters")
+                st.write("Try different seasonal patterns to find the optimal model")
+                
+                # Select frequency
+                freq_options = {'Daily': 'D', 'Weekly': 'W', 'Monthly': 'M'}
+                adv_ts_freq = st.selectbox(
+                    "Select time frequency", 
+                    options=list(freq_options.keys()),
+                    index=1,  # Default to Weekly
+                    key="adv_freq"
+                )
+                selected_adv_freq = freq_options[adv_ts_freq]
+                
+                # Select product
+                adv_product = st.selectbox(
+                    "Select product for forecasting",
+                    options=['All Products'] + sorted(df['PRODUCT'].unique().tolist()),
+                    key="adv_product"
+                )
+                
+                # Prepare time series data
+                if adv_product == 'All Products':
+                    adv_ts_df = prepare_ts_data(
+                        filtered_df, 
+                        date_col='Transaction Date', 
+                        target_col='AMOUNT', 
+                        freq=selected_adv_freq
+                    )
+                else:
+                    product_df = filtered_df[filtered_df['PRODUCT'] == adv_product]
+                    adv_ts_df = prepare_ts_data(
+                        product_df, 
+                        date_col='Transaction Date', 
+                        target_col='AMOUNT', 
+                        freq=selected_adv_freq
+                    )
+                
+                # Button to start the grid search
+                if st.button("Find Optimal Seasonal Pattern"):
+                    if not adv_ts_df.empty:
+                        # Default train/test split date
+                        adv_train_end = df['Transaction Date'].max() - pd.DateOffset(months=1)
+                        
+                        with st.spinner("Testing multiple seasonal patterns... This may take a few minutes"):
+                            # Try different seasonal patterns
+                            seasonal_results = try_multiple_seasonal_orders(
+                                adv_ts_df, 
+                                adv_train_end,
+                                base_order=(1,1,1),
+                                freq=selected_adv_freq
+                            )
+                            
+                            if seasonal_results:
+                                # Display results
+                                st.markdown("### Seasonal Pattern Results")
+                                results_data = []
+                                
+                                for result in seasonal_results:
+                                    results_data.append({
+                                        'Seasonal Period': result['seasonal_period'],
+                                        'MAPE (%)': round(result['metrics']['mape'], 2),
+                                        'MAE': round(result['metrics']['mae'], 2),
+                                        'RMSE': round(result['metrics']['rmse'], 2)
+                                    })
+                                
+                                results_df = pd.DataFrame(results_data)
+                                st.dataframe(results_df, use_container_width=True)
+                                
+                                # Get best model
+                                best_result = seasonal_results[0]  # Already sorted by MAPE
+                                
+                                st.success(f"Best seasonal pattern: {best_result['seasonal_period']} with MAPE: {best_result['metrics']['mape']:.2f}%")
+                                
+                                # Plot forecast with best model
+                                st.markdown("### Forecast with Optimal Model")
+                                
+                                # Create Plotly figure
+                                fig = go.Figure()
+                                
+                                # Historical data
+                                fig.add_trace(go.Scatter(
+                                    x=adv_ts_df.index, 
+                                    y=adv_ts_df.values,
+                                    mode='lines',
+                                    name='Historical Sales',
+                                    line=dict(color='blue')
+                                ))
+                                
+                                # Forecasted data
+                                forecast_df = best_result['forecast_df']
+                                fig.add_trace(go.Scatter(
+                                    x=forecast_df.index, 
+                                    y=forecast_df['Forecast'].values,
+                                    mode='lines',
+                                    name='Forecast',
+                                    line=dict(color='red')
+                                ))
+                                
+                                # Confidence intervals
+                                fig.add_trace(go.Scatter(
+                                    x=forecast_df.index.tolist() + forecast_df.index.tolist()[::-1],
+                                    y=forecast_df['Upper CI'].tolist() + forecast_df['Lower CI'].tolist()[::-1],
+                                    fill='toself',
+                                    fillcolor='rgba(255,0,0,0.2)',
+                                    line=dict(color='rgba(255,255,255,0)'),
+                                    name='95% Confidence Interval'
+                                ))
+                                
+                                fig.update_layout(
+                                    title=f"Optimal SARIMA Forecast (Period={best_result['seasonal_period']})",
+                                    xaxis_title="Date",
+                                    yaxis_title="Sales Amount (₹)",
+                                    template="plotly_white",
+                                    hovermode="x unified"
+                                )
+                                
+                                st.plotly_chart(fig, use_container_width=True)
+                            else:
+                                st.error("No valid models found. Try with different data or parameters.")
+                    else:
+                        st.error("Not enough data for the selected product and frequency.")
+
             # Custom CSS for dashboard layout
             st.markdown("""
             <style>
@@ -267,7 +695,7 @@ def main():
             }
             </style>
             """, unsafe_allow_html=True)
-            
+
             # VISUALIZATION SECTIONS ORGANIZED IN 3 COLUMNS
             
             # Section 1: Sales Analysis
@@ -699,7 +1127,6 @@ def main():
         st.info("Please upload an Excel file to begin analysis.")
 
 # Custom CSS
-# Custom CSS
 st.markdown("""
 <style>
 .visualization-container {
@@ -861,3 +1288,5 @@ div:contains("Showing analysis for 2,034 records"),
 # Run the main function
 if __name__ == "__main__":
     main()
+
+
