@@ -236,9 +236,24 @@ def train_sales_prediction_model(df):
     mae = mean_absolute_error(y_test, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     
-    st.sidebar.subheader("🤖 Prediction Model Performance")
-    st.sidebar.write(f"Mean Absolute Error: ₹{mae:.2f}")
-    st.sidebar.write(f"Mean Squared Error: {mse:.2f}")
+    # Modified section with custom styling
+    st.sidebar.markdown("""
+    <div class="prediction-model-section">
+        <h3>🤖 Prediction Model Performance</h3>
+        <p>Mean Absolute Error: ₹{:.2f}</p>
+        <p>Mean Squared Error: {:.2f}</p>
+        <hr>
+        <div class="team-members">
+            <h4>Team Members:</h4>
+            <ul>
+                <li>Hirthick S</li>
+                <li>Shyam Sundar M</li>
+                <li>Sathya Sai Narayanan</li>
+                <li>Hiruthik Balaji S</li>
+            </ul>
+        </div>
+    </div>
+    """.format(mae, mse), unsafe_allow_html=True)
     
     return rf_model, scaler, label_encoders
 
@@ -1282,6 +1297,77 @@ div:contains("Showing analysis for 2,034 records"),
   color: white !important;
   font-weight: 600 !important;
   text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.3) !important;
+}
+
+
+/* Prediction Model Performance Section Styling */
+.prediction-model-section {
+    background-color: #1e1e1e;
+    color: white !important;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.prediction-model-section h3 {
+    color: white !important;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.prediction-model-section p {
+    color: white !important;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.team-members {
+    margin-top: 15px;
+}
+
+.team-members h4 {
+    color: white !important;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.team-members ul {
+    list-style-type: none;
+    padding-left: 5px;
+}
+
+.team-members li {
+    color: white !important;
+    margin-bottom: 4px;
+}
+
+/* Additional CSS to ensure other UI elements have proper text color */
+[data-testid="stSidebarUserContent"] {
+    color: white !important;
+}
+
+.css-1cpxqw2, .css-1n76uvr {
+    color: white !important;
+}
+
+/* Override any conflicting styles */
+.stMarkdown div[data-testid="stMarkdownContainer"] p,
+.prediction-model-section p,
+.prediction-model-section h3,
+.prediction-model-section h4,
+.prediction-model-section li,
+.stSidebar [data-testid="stMarkdownContainer"] p {
+    color: white !important;
+}
+
+/* Ensure the div containing the prediction model performance text has white text */
+div:contains("Prediction Model Performance"),
+div:has(> h3:contains("Prediction Model Performance")),
+.sidebar .element-container {
+    color: white !important;
 }
 </style>
 """, unsafe_allow_html=True)
