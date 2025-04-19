@@ -236,27 +236,39 @@ def train_sales_prediction_model(df):
     mae = mean_absolute_error(y_test, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     
-    # Custom CSS to make text white
+    # Custom CSS to style the metrics
     st.markdown("""
     <style>
     .prediction-model-section {
         color: white !important;
     }
-    .prediction-model-section h3, 
-    .prediction-model-section h4, 
-    .prediction-model-section p,
-    .prediction-model-section li {
+    .metric-value {
+        background-color: white;
+        color: black;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        display: inline-block;
+        margin-left: 5px;
+    }
+    .metric-label {
         color: white !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Modified section with custom styling and white text
+    # Modified section with custom styling and highlighted metrics
     st.sidebar.markdown("""
     <div class="prediction-model-section">
         <h3>🤖 Prediction Model Performance</h3>
-        <p>Mean Absolute Error: ₹{:.2f}</p>
-        <p>Mean Squared Error: {:.2f}</p>
+        <p class="metric-row">
+            <span class="metric-label">Mean Absolute Error:</span> 
+            <span class="metric-value">₹{:.2f}</span>
+        </p>
+        <p class="metric-row">
+            <span class="metric-label">Mean Squared Error:</span> 
+            <span class="metric-value">{:.2f}</span>
+        </p>
         <hr>
         <div class="team-members">
             <h4>Team Members:</h4>
