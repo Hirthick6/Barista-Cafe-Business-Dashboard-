@@ -236,7 +236,22 @@ def train_sales_prediction_model(df):
     mae = mean_absolute_error(y_test, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     
-    # Modified section with custom styling
+    # Custom CSS to make text white
+    st.markdown("""
+    <style>
+    .prediction-model-section {
+        color: white !important;
+    }
+    .prediction-model-section h3, 
+    .prediction-model-section h4, 
+    .prediction-model-section p,
+    .prediction-model-section li {
+        color: white !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Modified section with custom styling and white text
     st.sidebar.markdown("""
     <div class="prediction-model-section">
         <h3>🤖 Prediction Model Performance</h3>
