@@ -4,3 +4,11 @@ numpy>=1.20.0
 plotly>=5.5.0
 scikit-learn>=1.0.0
 openpyxl>=3.0.0
+streamlit
+statsmodels
+matplotlib
+pandas
+numpy
+plotly
+openpyxl
+scikit-learn
