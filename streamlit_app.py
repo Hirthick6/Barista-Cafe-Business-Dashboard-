@@ -355,7 +355,7 @@ def main():
                 st.metric(label="💲 Average Price", value=f"₹{avg_price:.2f}")
 
             with col4:
-                unique_products = filtered_df['PRODUCT'].nunique()
+                unique_products = filtered_df['ITEM'].nunique()
                 st.metric(label="🍽️ Unique Products", value=unique_products)
 
             # Train Prediction Model
