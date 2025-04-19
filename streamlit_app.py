@@ -37,7 +37,7 @@ def parse_date(date_str):
 @st.cache_data
 def load_data(file_path):
     try:
-        df = pd.read_excel("DATASET_BA (1).xlsx")
+        df = pd.read_excel("DATASET_BA.xlsx")
         df.columns = [col.strip() for col in df.columns]
         
         if 'Transaction Date' in df.columns:
